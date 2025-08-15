@@ -165,6 +165,7 @@ function goToChest()
     while facing ~= 2 do turnRight() end
     
     -- Deposit items
+    moveForward()
     for slot = 2, 16 do
         turtle.select(slot)
         turtle.drop()
