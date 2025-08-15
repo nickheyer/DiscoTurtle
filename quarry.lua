@@ -1,10 +1,12 @@
 -- Simple Quarry Program for Mining Turtle (3-layer mining)
 -- Place chest behind starting position
 -- Turtle slot 1: fuel (coal), slots 2-16: storage
+-- Usage: quarry [width] [length] [depth]
 
-local width = 32  -- Quarry width
-local length = 32 -- Quarry length
-local depth = 64  -- Max depth to mine
+local args = {...}
+local width = tonumber(args[1]) or 32  -- Quarry width
+local length = tonumber(args[2]) or 32 -- Quarry length
+local depth = tonumber(args[3]) or 64  -- Max depth to mine
 
 local startX, startY, startZ = 0, 0, 0
 local x, y, z = 0, 0, 0
@@ -102,19 +104,46 @@ end
 
 -- Fuel management
 function checkFuel()
-    if turtle.getFuelLevel() < 100 then
-        for slot = 1, 16 do
+    -- First, ensure coal/charcoal is in slot 1
+    turtle.select(1)
+    local slot1 = turtle.getItemDetail()
+    
+    -- If slot 1 doesn't have fuel, find fuel and swap it to slot 1
+    if not slot1 or (slot1.name ~= "minecraft:coal" and slot1.name ~= "minecraft:charcoal") then
+        for slot = 2, 16 do
             turtle.select(slot)
             local item = turtle.getItemDetail()
-            if item and (item.name == "minecraft:coal" or 
-                        item.name == "minecraft:charcoal") then
-                turtle.refuel(math.min(item.count, 32))
-                if turtle.getFuelLevel() > 500 then
-                    break
+            if item and (item.name == "minecraft:coal" or item.name == "minecraft:charcoal") then
+                -- Transfer fuel to slot 1
+                turtle.transferTo(1)
+                break
+            end
+        end
+    end
+    
+    -- Now refuel if needed
+    if turtle.getFuelLevel() < 100 then
+        turtle.select(1)
+        local fuelItem = turtle.getItemDetail()
+        if fuelItem and (fuelItem.name == "minecraft:coal" or fuelItem.name == "minecraft:charcoal") then
+            turtle.refuel(math.min(fuelItem.count, 32))
+        end
+        
+        -- If still need more fuel, check other slots
+        if turtle.getFuelLevel() < 500 then
+            for slot = 2, 16 do
+                turtle.select(slot)
+                local item = turtle.getItemDetail()
+                if item and (item.name == "minecraft:coal" or item.name == "minecraft:charcoal") then
+                    turtle.refuel(math.min(item.count, 32))
+                    if turtle.getFuelLevel() > 500 then
+                        break
+                    end
                 end
             end
         end
     end
+    
     turtle.select(1)
 end
 
@@ -144,9 +173,12 @@ function goToChest()
     local savedX, savedY, savedZ = x, y, z
     local savedFacing = facing
     
-    -- Go to surface
+    -- Return to exact starting height (y=0)
     while y < 0 do
         moveUp()
+    end
+    while y > 0 do
+        moveDown()
     end
     
     -- Go to start X
@@ -319,6 +351,9 @@ end
 print("Quarry complete, returning to surface")
 while y < 0 do
     moveUp()
+end
+while y > 0 do
+    moveDown()
 end
 
 while z > 0 do
