@@ -154,18 +154,26 @@ function goToChest()
         while facing ~= 3 do turnRight() end
         moveForward()
     end
+    while x < 0 do
+        while facing ~= 1 do turnRight() end
+        moveForward()
+    end
     
     -- Go to start Z
     while z > 0 do
         while facing ~= 2 do turnRight() end
         moveForward()
     end
+    while z < 0 do
+        while facing ~= 0 do turnRight() end
+        moveForward()
+    end
     
-    -- Face chest (behind start position)
+    -- Move one block backward to chest position
     while facing ~= 2 do turnRight() end
+    moveForward()
     
     -- Deposit items
-    moveForward()
     for slot = 2, 16 do
         turtle.select(slot)
         turtle.drop()
@@ -181,9 +189,11 @@ function goToChest()
         end
     end
     
-    -- Return to mining position
+    -- Return to starting position first
     while facing ~= 0 do turnRight() end
+    moveForward()
     
+    -- Now return to mining position
     while z < savedZ do
         moveForward()
     end
@@ -326,17 +336,32 @@ while z > 0 do
     while facing ~= 2 do turnRight() end
     moveForward()
 end
+while z < 0 do
+    while facing ~= 0 do turnRight() end
+    moveForward()
+end
 
 while x > 0 do
     while facing ~= 3 do turnRight() end
     moveForward()
 end
+while x < 0 do
+    while facing ~= 1 do turnRight() end
+    moveForward()
+end
+
+-- Move to chest (one block behind start)
+while facing ~= 2 do turnRight() end
+moveForward()
 
 -- Final deposit
-while facing ~= 2 do turnRight() end
 for slot = 1, 16 do
     turtle.select(slot)
     turtle.drop()
 end
+
+-- Return to start position
+while facing ~= 0 do turnRight() end
+moveForward()
 
 print("Mining complete!")
