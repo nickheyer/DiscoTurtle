@@ -2,9 +2,9 @@
 -- Place chest behind starting position
 -- Turtle slot 1: fuel (coal), slots 2-16: storage
 
-local width = 16  -- Quarry width
-local length = 16 -- Quarry length
-local depth = 60  -- Max depth to mine
+local width = 32  -- Quarry width
+local length = 32 -- Quarry length
+local depth = 64  -- Max depth to mine
 
 local startX, startY, startZ = 0, 0, 0
 local x, y, z = 0, 0, 0
